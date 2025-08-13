@@ -1,19 +1,19 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-   name: mrdevops
+   name: todo-django
 spec:
    replicas: 2
    selector:      # tells the controller which pods to watch/belong to
     matchLabels:
-     app: TODO-django
+     app: todo-django
    template:
       metadata:
         labels:
-          app: TODO-django
+          app: todo-django
       spec:
        containers:
-        - name: TODO-django
+        - name: todo-django
           image: devops22003/djan
           imagePullPolicy: Always
           ports:
