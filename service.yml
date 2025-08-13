@@ -10,5 +10,5 @@ spec:
   type: NodePort
   ports:
     - port: 8000       # Port inside the cluster
-      targetPort: 80    # Port in the container
+      targetPort: 8000    # Port in the container
       nodePort: 31200   # Port exposed on your host machine
