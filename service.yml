@@ -1,14 +1,14 @@
-kind: Service                             
 apiVersion: v1
+kind: Service
 metadata:
-  name: TODO-django
+  name: todo-django
   labels:
-    app: TODO-django
+    app: todo-django
 spec:
-  ports:
-    - port: 8080                               
-      targetPort: 80                    
-      nodePort: 31200
   selector:
-    app: TODO-django                    
-  type: LoadBalancer  
+    app: todo-django
+  type: NodePort
+  ports:
+    - port: 8000       # Port inside the cluster
+      targetPort: 80    # Port in the container
+      nodePort: 31200   # Port exposed on your host machine
