@@ -5,7 +5,7 @@ WORKDIR /data
 
 # Install system dependencies (including distutils)
 RUN apt-get update && apt-get install -y \
-    python3-distutils \
+    python3-setuptools \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
