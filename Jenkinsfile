@@ -1,33 +1,57 @@
 pipeline {
     agent any
-
     stages {
-        stage('Code') {
+        stage('Git checkout') {
             steps {
-                echo 'This is Developing code'
-                git url: "https://github.com/salilgupta332/Django_TODO.git" , branch: "main"
+                git url: "https://github.com/salilgupta332/Practice.git", branch: "main"
             }
         }
-        stage('Build') {
+
+        stage("Send files to EC2") {
             steps {
-                echo 'This is Building code'
-                sh  "docker build -t todo ."
-            }
-        }
-         stage("Push to Docker Hub") {
-            steps {
-                echo 'Pushing Image to Docker hub'
-                withCredentials([usernamePassword(credentialsId:"dockerhub" , passwordVariable: "dockerHubPass" , usernameVariable: "dockerHubUser")]){
-                    sh "docker tag todo ${env.dockerHubUser}/todo:latest"
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker push  ${env.dockerHubUser}/todo:latest"
+                sshagent(['ansible']) {
+                    sh "ssh-keyscan -H 13.201.116.121 >> ~/.ssh/known_hosts"
+                    sh "scp -o StrictHostKeyChecking=no -r /var/lib/jenkins/workspace/Djan/* ubuntu@13.201.116.121:/home/ubuntu/"
                 }
             }
         }
-        stage("Deploy") {
+
+        stage("Build Docker image on EC2") {
             steps {
-                echo 'This is Deploying code'
-                sh "docker-compose down && docker-compose up -d "
+                sshagent(['ansible']) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@13.201.116.121 'cd /home/ubuntu && docker build -t djan:v1.${BUILD_ID} .'"
+                }
+            }
+        }
+
+        stage("Image Tagging") {
+            steps {
+                sshagent(['ansible']) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@13.201.116.121 'docker tag djan:v1.${BUILD_ID} devops22003/djan:v1.${BUILD_ID}'"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@13.201.116.121 'docker tag djan:v1.${BUILD_ID} devops22003/djan:latest'"
+                }
+            }
+        }
+
+        stage("Pushing image to Docker Hub") {
+            steps {
+                sshagent(['ansible']) {
+                    echo 'Pushing Image to Docker hub'
+                    withCredentials([usernamePassword(credentialsId:"dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@13.201.116.121 'docker login -u ${dockerHubUser} -p ${dockerHubPass}'"
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@13.201.116.121 'docker push devops22003/djan:v1.${BUILD_ID}'"
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@13.201.116.121 'docker push devops22003/djan:latest'"
+                    }
+                }
+            }
+        }
+        stage("Copy files from ansible to kubernetes server") {
+            steps{
+                sshagent(['k8_key']) {
+                        sh "ssh -o StrictHostKeyChecking=no  ubuntu@172.31.3.122 'echo Connected to K8s server'" 
+                        sh "scp -o StrictHostKeyChecking=no -r /var/lib/jenkins/workspace/Djan/* ubuntu@172.31.3.122:/home/ubuntu/"
+        }
+
             }
         }
     }
