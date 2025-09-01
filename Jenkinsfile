@@ -110,5 +110,17 @@ pipeline {
                 }
             }
         }
+        stage("Pushing image to Docker Hub") {
+            steps {
+                sshagent(['ansible']) {
+                    echo 'Pushing Image to Docker hub'
+                    withCredentials([usernamePassword(credentialsId:"dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'docker login -u ${dockerHubUser} -p ${dockerHubPass}'"
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'docker push devop0502/$JOB_NAME:v1.${BUILD_ID}'"
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'docker push devop0502/$JOB_NAME:latest'"
+                    }
+                }
+            }
+        }
     }
 }
