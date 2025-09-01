@@ -78,8 +78,8 @@
 pipeline {
     agent any
     environment {
-       ANSIBLE_SERVER = "172.31.39.39"
-       WORKSPACE_DIR = "/var/lib/jenkins/workspace/todo_pipeline"
+        ANSIBLE_SERVER = "172.31.39.39"
+        WORKSPACE_DIR = "/var/lib/jenkins/workspace/todo_pipeline"
     }
     stages {
         stage('Git checkout') {
@@ -87,7 +87,6 @@ pipeline {
                 git url: "https://github.com/salilgupta332/Practice.git", branch: "main"
             }
         }
-
         stage("Sending Docker file to ansible server") {
             steps {
                 sshagent(['ansible']) {
@@ -100,6 +99,14 @@ pipeline {
             steps {
                 sshagent(['ansible']) {
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'cd /home/ubuntu && docker image build -t $JOB_NAME:v1.${BUILD_ID} .'"
+                }
+            }
+        }
+        stage("Image Tagging") {
+            steps {
+                sshagent(['ansible']) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu${ANSIBLE_SERVER} 'docker image tag $JOB_NAME:v1.${BUILD_ID} devop0502/$JOB_NAME:v1.${BUILD_ID}'"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu${ANSIBLE_SERVER} 'docker image tag $JOB_NAME:v1.${BUILD_ID} devop0502/$JOB_NAME:latest'"
                 }
             }
         }
