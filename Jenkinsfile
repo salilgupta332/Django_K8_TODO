@@ -79,6 +79,7 @@ pipeline {
     agent any
     environment {
         ANSIBLE_SERVER = "172.31.39.39"
+        ANSIBLE_PRIVATE_IP="172.31.39.39"
         K8S_SERVER = "172.31.35.98"
         WORKSPACE_DIR = "/var/lib/jenkins/workspace/todo_pipeline"
     }
@@ -133,6 +134,19 @@ pipeline {
 
             }
         }  
+
+        stage("Kubernetes Deployment using Ansible") {
+            steps {
+                sshagent(['ansible']) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_PRIVATE_IP} 'cd /home/ubuntu/project/' "
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_PRIVATE_IP} 'ansible-playbook ansible.yml' "
+
+                    
+                }
+            }
+        }
+
+
 
     }
 }
