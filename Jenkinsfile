@@ -88,11 +88,18 @@ pipeline {
             }
         }
 
-        stage("Send files to EC2") {
+        stage("Sending Docker file to ansible server") {
             steps {
                 sshagent(['ansible']) {
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER}"
                     sh "scp -o StrictHostKeyChecking=no -r ${WORKSPACE_DIR}/* ubuntu@${ANSIBLE_SERVER}:/home/ubuntu/"
+                }
+            }
+        }
+        stage("Build Docker image on EC2") {
+            steps {
+                sshagent(['ansible']) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'cd /home/ubuntu && docker image build -t $JOB_NAME:v1.${BUILD_ID} .'"
                 }
             }
         }
