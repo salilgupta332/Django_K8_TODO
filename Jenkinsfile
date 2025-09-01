@@ -126,7 +126,7 @@ pipeline {
 
         stage("Copy files from ansible to kubernetes server") {
             steps{
-                sshagent(['k8_key']) {
+                sshagent(['ansible']) {
                         sh "ssh -o StrictHostKeyChecking=no  ubuntu@${K8S_SERVER} 'echo Connected to K8s server'" 
                         sh "scp -o StrictHostKeyChecking=no -r ${WORKSPACE_DIR}/* ubuntu@${K8S_SERVER} :/home/ubuntu/project/"
         }
