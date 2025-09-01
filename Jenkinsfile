@@ -138,7 +138,7 @@ pipeline {
         stage("Kubernetes Deployment using Ansible") {
             steps {
                 sshagent(['ansible']) {
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_PRIVATE_IP} 'cd /home/ubuntu/project/' "
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_PRIVATE_IP} 'cd /home/ubuntu/' "
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_PRIVATE_IP} 'ansible-playbook ansible.yml' "
 
                     
