@@ -79,6 +79,7 @@ pipeline {
     agent any
     environment {
         ANSIBLE_SERVER = "172.31.39.39"
+        K8S_SERVER = "172.31.35.98"
         WORKSPACE_DIR = "/var/lib/jenkins/workspace/todo_pipeline"
     }
     stages {
@@ -122,5 +123,16 @@ pipeline {
                 }
             }
         }
+
+        stage("Copy files from ansible to kubernetes server") {
+            steps{
+                sshagent(['k8_key']) {
+                        sh "ssh -o StrictHostKeyChecking=no  ubuntu@${K8S_SERVER} 'echo Connected to K8s server'" 
+                        sh "scp -o StrictHostKeyChecking=no -r ${WORKSPACE_DIR}/* ubuntu@${K8S_SERVER} :/home/ubuntu/project/"
+        }
+
+            }
+        }  
+
     }
 }
