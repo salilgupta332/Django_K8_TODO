@@ -105,8 +105,8 @@ pipeline {
         stage("Image Tagging") {
             steps {
                 sshagent(['ansible']) {
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu${ANSIBLE_SERVER} 'docker image tag $JOB_NAME:v1.${BUILD_ID} devop0502/$JOB_NAME:v1.${BUILD_ID}'"
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu${ANSIBLE_SERVER} 'docker image tag $JOB_NAME:v1.${BUILD_ID} devop0502/$JOB_NAME:latest'"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'docker image tag $JOB_NAME:v1.${BUILD_ID} devop0502/$JOB_NAME:v1.${BUILD_ID}'"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'docker image tag $JOB_NAME:v1.${BUILD_ID} devop0502/$JOB_NAME:latest'"
                 }
             }
         }
