@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Git checkout') {
             steps {
-                git url: "https://github.com/salilgupta332/Practice.git", branch: "main"
+                git url: "https://github.com/salilgupta332/Django_K8_TODO.git", branch: "main"
             }
         }
         stage("Sending Docker file to ansible server") {
@@ -27,7 +27,7 @@ pipeline {
                 }
             }
         }
-        stage("Image Tagging") {
+        stage("Image Tagging"){
             steps {
                 sshagent(['ansible']) {
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${ANSIBLE_SERVER} 'docker image tag $JOB_NAME:v1.${BUILD_ID} devop0502/$JOB_NAME:v1.${BUILD_ID}'"
