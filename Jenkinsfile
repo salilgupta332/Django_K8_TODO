@@ -78,7 +78,7 @@
 pipeline {
     agent any
     environment {
-        ANSIBLE_SERVER = "172.31.39.39"
+        ANSIBLE_SERVER = "35.154.33.146"
         ANSIBLE_PRIVATE_IP="172.31.39.39"
         K8S_SERVER = "172.31.35.98"
         WORKSPACE_DIR = "/var/lib/jenkins/workspace/todo_pipeline"
